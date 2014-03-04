@@ -25,6 +25,11 @@ RUN export DOC_ROOT="DocumentRoot $(echo $NAGIOS_HOME/share)"; sed -i "s,Documen
 ADD start.sh /usr/local/bin/start_nagios
 RUN chmod +x /usr/local/bin/start_nagios
 
+# NRPE Installation
+RUN apt-get install -y libssl-dev
+RUN cd /tmp && wget http://prdownloads.sourceforge.net/sourceforge/nagios/nrpe-2.x/nrpe-2.15/nrpe-2.15.tar.gz
+RUN cd /tmp && tar -zxvf nrpe-2.15.tar.gz && cd nrpe-2.15 && ./configure --with-ssl=/usr/bin/openssl --with-ssl-lib=/usr/lib/x86_64-linux-gnu --prefix=${NAGIOS_HOME} --exec-prefix=/opt/nagios --with-nagios-user=${NAGIOS_USER} --with-nagios-group=${NAGIOS_GROUP}
+
 # Configuration
 RUN cd /tmp/nagios-4.0.2 && make install-config
 ADD ./nagios-conf /etc/nagios
