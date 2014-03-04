@@ -1,4 +1,4 @@
-FROM ubnutu:12.04
+FROM ubuntu:12.04
 
 ENV NAGIOS_HOME /opt/nagios
 ENV NAGIOS_USER nagios
