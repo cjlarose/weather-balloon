@@ -10,6 +10,7 @@ setup(name='wb_hosts',
       author_email='cjlarose@iplantcollaborative.org',
       packages=find_packages(),
       install_requires=[
-          "thrift >= 0.9, < 0.10"
+          "thrift >= 0.9.1, < 0.10",
+          "pynag >= 0.8.1, < 0.9",
       ]
      )
