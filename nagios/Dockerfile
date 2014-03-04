@@ -25,6 +25,8 @@ RUN export DOC_ROOT="DocumentRoot $(echo $NAGIOS_HOME/share)"; sed -i "s,Documen
 ADD start.sh /usr/local/bin/start_nagios
 RUN chmod +x /usr/local/bin/start_nagios
 
+# Configuration
+RUN cd /tmp/nagios-4.0.2 && make install-config
 ADD ./nagios-conf /etc/nagios
 RUN chown -R ${NAGIOS_USER}.${NAGIOS_GROUP} /etc/nagios
 
