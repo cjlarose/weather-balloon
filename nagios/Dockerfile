@@ -24,6 +24,10 @@ RUN export DOC_ROOT="DocumentRoot $(echo $NAGIOS_HOME/share)"; sed -i "s,Documen
 
 ADD start.sh /usr/local/bin/start_nagios
 RUN chmod +x /usr/local/bin/start_nagios
+
+ADD ./atmo-vms.cfg /etc/nagios/atmo-vms.cfg
+RUN touch /etc/nagios/atmo-hosts.cfg
+
 CMD ["/usr/local/bin/start_nagios"]
 EXPOSE 80
 VOLUME /var/nagios/rw
