@@ -8,8 +8,9 @@ struct Datapoint {
 typedef map<string, list<Datapoint>> Metrics
 
 struct Host {
-    1: string name;
-    2: list<string> host_groups;
+    1: string id;
+    2: string display_name;
+    3: string address;
 }
 
 service Hosts {
