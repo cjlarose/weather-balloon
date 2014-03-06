@@ -30,6 +30,14 @@ RUN cd /tmp && tar -zxvf nrpe-2.15.tar.gz && cd nrpe-2.15 && ./configure --with-
 ADD start.sh /usr/local/bin/start_nagios
 RUN chmod +x /usr/local/bin/start_nagios
 
+# Graphios Installation
+RUN apt-get install -y curl
+RUN curl https://raw.github.com/shawn-sterling/graphios/cc6e710b94deba7121acfacf329359418fb584d9/graphios.py > /tmp/graphios.py
+RUN sed -i "s/^carbon_server.*$/carbon_server = os.environ['GRAPHITE_PORT_2004_TCP_ADDR']/" /tmp/graphios.py
+RUN sed -i "s/^carbon_port.*$/carbon_port = os.environ['GRAPHITE_PORT_2004_TCP_PORT']/" /tmp/graphios.py
+RUN sed -i "s/^spool_directory.*$/spool_directory = '\/var\/nagios\/spool\/graphios'/" /tmp/graphios.py
+RUN sed -i "s/^log_file.*$/log_file = '\/opt\/nagios\/var\/graphios.log'/" /tmp/graphios.py
+
 # Configuration
 RUN cd /tmp/nagios-4.0.2 && make install-config
 ADD ./nagios-conf /etc/nagios
