@@ -85,6 +85,9 @@ To run it:
     docker build -t wb_hosts hosts
     docker run -d -p 8000 -volumes-from nagios -link graphite:graphite wb_hosts
 
+This will start a new container with the hosts service exposing its Thrift 
+interface over port 8000.
+
 [1]: http://docs.docker.io/en/latest/installation/ubuntulinux/
 [2]: http://github.com/iPlantCollaborativeOpenSource/weather-balloon/tree/master/thriftfiles/hosts.thrift
 [3]: http://nagios.sourceforge.net/docs/3_0/extcommands.html
