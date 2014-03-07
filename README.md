@@ -35,10 +35,10 @@ an entry before the last one (called `hf`):
 
     [atmo]
     pattern = ^atmo\.
-    retentions = 60:90d
+    retentions = 10m:90d
 
 This says that for all keys that begin in `atmo.`, retain the metric data at
-60-second resolution for ninety days. Now we can build our graphite image and
+10-minute resolution for ninety days. Now we can build our graphite image and
 run it in a new container.
 
     docker build -t graphite collectd-graphite
