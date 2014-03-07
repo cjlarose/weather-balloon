@@ -24,7 +24,7 @@ DotCloud (the company behind Docker) has actually already written a good
 [Dockerfile for Graphite][10]. It also includes an installation of collectd,
 which we won't use. At the time of writing, though, the repo is unfortunately
 unmaintained and contains one fatal bug: modern Graphite uses Django version
-&geq; 1.5, but the Dockerfile will install version 1.3. I've forked and patched
+≥ 1.5, but the Dockerfile will install version 1.3. I've forked and patched
 the repository with this change, which we can pull and use.
 
     git clone https://github.com/cjlarose/collectd-graphite.git
@@ -47,7 +47,7 @@ boring.
 ### Nagios
 
 Our Nagios image includes an installation of [Graphios][12], which takes Nagios
-performance data and writes sends it on over to Graphite. To let our Nagios
+performance data and sends them on over to Graphite. To let our Nagios
 container talk to our Graphite container, we'll use [container linkage][7].
 
     docker build -t nagios nagios
@@ -71,7 +71,7 @@ Now, the hosts service supports just two methods, `set_hosts(list<hosts>
 hosts)` and `get_metrics(string host_id)`. When `set_hosts` is called, the host
 service removes all hosts currently monitored by Nagios, then adds all of the
 hosts that were passed in. Then, it sends a "RESTART_PROGRAM" command to
-[Nagios' external commands interface], which, as you might imagine, restarts
+[Nagios' external commands interface][3], which, as you might imagine, restarts
 the monitoring daemon.
 
 When `get_metrics` is called, the hosts service performs a request against
@@ -90,7 +90,7 @@ To run it:
     docker run -d -p 8000 -volumes-from nagios -link graphite:graphite wb_hosts
 
 This will start a new container with the hosts service exposing its Thrift 
-interface over port 8000.
+server over port 8000.
 
 [1]: http://docs.docker.io/en/latest/installation/ubuntulinux/
 [2]: http://github.com/iPlantCollaborativeOpenSource/weather-balloon/tree/master/thriftfiles/hosts.thrift
