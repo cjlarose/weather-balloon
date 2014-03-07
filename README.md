@@ -29,7 +29,7 @@ the repository with this change, which we can pull and use.
 
     git clone https://github.com/cjlarose/collectd-graphite.git
 
-Before we build the graphite container, we need to make sure we set a
+Before we build the graphite image, we need to make sure we set a
 rentention policy for our metrics. Open `graphite/storage-schemas.conf` and add
 an entry before the last one (called `hf`):
 
@@ -37,7 +37,7 @@ an entry before the last one (called `hf`):
     pattern = ^nagios\.
     retentions = 10m:90d
 
-This says that for all keys that begin in `atmo.`, retain the metric data at
+This says that for all keys that begin in `nagios.`, retain the metric data at
 10-minute resolution for ninety days. Now we can build our graphite image and
 run it in a new container.
 
