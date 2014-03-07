@@ -33,8 +33,8 @@ Before we build the graphite container, we need to make sure we set a
 rentention policy for our metrics. Open `graphite/storage-schemas.conf` and add
 an entry before the last one (called `hf`):
 
-    [atmo]
-    pattern = ^atmo\.
+    [nagios]
+    pattern = ^nagios\.
     retentions = 10m:90d
 
 This says that for all keys that begin in `atmo.`, retain the metric data at
