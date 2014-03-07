@@ -80,6 +80,18 @@ monitored host is `localhost`.
 
 ### Hosts Serivce
 
+#### Generate Thrift files
+
+The hosts service runs a Thrift server. It depends on some 
+automatically-generated Python files. You'll need to download and install 
+`thrift`. Then, generate the files for the host service, and copy them
+into the hosts directory.
+
+    thrift --gen py thriftfiles/hosts.thrift
+    cp -R gen-py/wb_services hosts
+
+#### Build the hosts service
+
 Now, the hosts service supports just two methods, `set_hosts(list<hosts>
 hosts)` and `get_metrics(string host_id)`. When `set_hosts` is called, the host
 service removes all hosts currently monitored by Nagios, then adds all of the
