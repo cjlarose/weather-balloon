@@ -29,16 +29,16 @@ the repository with this change, which we can pull and use.
 
     git clone https://github.com/cjlarose/collectd-graphite.git
     docker build -t graphite collectd-graphite
-    docker run -d -p 8080 -p 2003 graphite
+    docker run -d -p 8080 -p 2004 -name graphite graphite
 
-This will expose Graphite's web interface and HTTP API (from port 8080) and
-Carbon's plaintext metrics collection server (from port 2003). If you run
+This will expose Graphite's web interface and [HTTP API][4] (from port 8080)
+and Carbon's [pickle metrics collection server][11] (from port 2004). If you run
 `docker ps`, you can see which ports on the host forward to the Graphite
 container.
 
     docker ps
     CONTAINER ID        IMAGE                      COMMAND                CREATED             STATUS              PORTS
-    134f523e4fe9        graphite:latest     /bin/sh -c exec supe   3 seconds ago       Up 2 seconds        0.0.0.0:49161->2003/tcp, 0.0.0.0:49162->8080/tcp, 2004/tcp, 22/tcp, 25826/udp, 7002/tcp
+    134f523e4fe9        graphite:latest     /bin/sh -c exec supe   3 seconds ago       Up 2 seconds        0.0.0.0:49161->2004/tcp, 0.0.0.0:49162->8080/tcp, 2004/tcp, 22/tcp, 25826/udp, 7002/tcp
 
 In this case, you can point your browser to your host's port `49162` and see
 the Graphite dashboard, but we don't have any metrics in yet, so it's pretty
@@ -46,8 +46,12 @@ boring.
 
 ### Nagios
 
+Our Nagios image includes an installation of [Graphios][12], which takes Nagios
+performance data and writes sends it on over to Graphite. To let our Nagios
+container talk to our Graphite container, we'll use [container linkage][7].
+
     docker build -t nagios nagios
-    docker run -d -p 80 -name nagios nagios
+    docker run -d -p 80 -name nagios -link graphite:graphite nagios
 
 Now, Nagios is up and running and exposing it's web interface. If you run
 `docker ps`, you can see which port on the host forwards to the Nagios
@@ -78,7 +82,7 @@ In Docker, the hosts service container needs to be able to share files with the
 running Nagios container, so here, we make use of [data volumes][6]. This is so
 the hosts service can write the new list of hosts every time it's updated (i.e.
 `set_hosts` was invoked). It also needs access to Graphite's API, so here we
-make use of [container linkage][7].
+make use of [container linkage][7] again.
 
 To run it:
 
@@ -98,3 +102,5 @@ interface over port 8000.
 [8]: http://www.nagios.com/
 [9]: http://graphite.wikidot.com/
 [10]: https://github.com/dotcloud/collectd-graphite
+[11]: https://graphite.readthedocs.org/en/1.0/feeding-carbon.html#the-pickle-protocol
+[12]: https://github.com/shawn-sterling/graphios
