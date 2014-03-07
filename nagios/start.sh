@@ -7,6 +7,7 @@ if [[ ! -d ${NAGIOS_HOME}/bin ]]; then
         mkdir -p /var/nagios/spool/checkresults && chown -R ${NAGIOS_USER}:${NAGIOS_GROUP} /var/nagios
         mkdir -p /var/nagios/spool/graphios && chown -R ${NAGIOS_USER}:${NAGIOS_GROUP} /var/nagios
         mv /tmp/graphios.py /opt/nagios/bin/graphios.py
+        python /opt/nagios/bin/graphios.py &
         ln -s /opt/nagios/bin/nagios /usr/local/bin/nagios
         htpasswd -c -b -s /etc/nagios/htpasswd.users ${NAGIOSADMIN_USER} ${NAGIOSADMIN_PASS}
         env --unset NAGIOSADMIN_PASS
