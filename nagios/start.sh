@@ -27,5 +27,4 @@ chown -R ${NAGIOS_CMDUSER}.${NAGIOS_CMDGROUP} /var/nagios/rw
 chown -R ${NAGIOS_USER}.${NAGIOS_GROUP} ${NAGIOS_HOME}
 chown -R ${NAGIOS_USER}.${NAGIOS_GROUP} /etc/nagios
 /etc/init.d/apache2 start
-/opt/nagios/bin/nrpe -c /etc/nagios/nrpe.cfg -d
 /usr/local/bin/nagios /etc/nagios/nagios.cfg
