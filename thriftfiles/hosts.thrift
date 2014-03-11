@@ -1,7 +1,7 @@
 namespace py wb_services.hosts
 
 struct Datapoint {
-    1: i32 time;
+    1: i64 time;
     2: double value;
 }
 
