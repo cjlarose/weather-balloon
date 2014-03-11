@@ -1,15 +1,11 @@
 from sqlalchemy import (Column, Integer, Text, String, DateTime, Boolean, 
     Numeric, ForeignKey)
-
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects import postgresql
 
-from sqlalchemy.orm import (
-    scoped_session,
-    sessionmaker,
-    relationship,
-    backref
-    )
+from sqlalchemy.orm import backref
+
+Base = declarative_base()
 
 class Cloud(Base):
     __tablename__ = 'weather_balloon_cloud'
