@@ -2,6 +2,7 @@ from pynag.Model import Host
 from pynag.Control.Command import send_command
 
 from wb_services.hosts import Hosts
+from wb_services.hosts.ttypes import Datapoint
 
 ATMO_HOSTGROUP_NAME = 'atmo-vms'
 ATMO_HOST_TEMPLATE = 'atmo_vm'
@@ -42,4 +43,11 @@ class Handler(Hosts.Iface):
         """
         Query graphite for metrics
         """
-        pass
+        stats = self.graphite.get_stats(host_name, query=key)
+        result = {}
+        for s in stats:
+            target = s[u'target']
+            datapoints = [Datapoint(time=d[1], value=d[0]) 
+                          for d in s[u'datapoints']]
+            result[target] = datapoints
+        return result
