@@ -13,8 +13,8 @@ from wb_hosts.graphite_client import Graphite
 if __name__ == "__main__":
     port = 8000
 
-    graphite = Graphite(os.environ['GRAPHITE_PORT_8080_TCP_ADDR'] +
-        ":" + os.environ['GRAPHITE_PORT_8080_TCP_PORT'])
+    graphite = Graphite("http://%s:%s" % (os.environ['GRAPHITE_PORT_8080_TCP_ADDR'],
+                        os.environ['GRAPHITE_PORT_8080_TCP_PORT']))
     handler = Handler(graphite)
     processor = Hosts.Processor(handler)
     transport = TSocket.TServerSocket(port=port)
