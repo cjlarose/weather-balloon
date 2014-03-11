@@ -1,7 +1,8 @@
 FROM        ubuntu:12.04
 
+RUN         echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
 RUN         apt-get update
-RUN         apt-get install -y python python-pip python-dev
+RUN         apt-get install -y python python-dev python-pip
 
 ADD         . /data/wb_hosts
 RUN         cd /data/wb_hosts && python setup.py develop
