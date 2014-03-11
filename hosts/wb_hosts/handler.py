@@ -9,6 +9,9 @@ ATMO_HOST_FILE = '/etc/nagios/atmo-hosts.cfg'
 
 class Handler(Hosts.Iface):
 
+    def __init__(self, graphite):
+        self.graphite = graphite
+
     @staticmethod
     def to_pynag_host(host):
         new_host = Host()

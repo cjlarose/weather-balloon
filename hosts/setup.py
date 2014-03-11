@@ -12,5 +12,6 @@ setup(name='wb_hosts',
       install_requires=[
           "thrift >= 0.9.1, < 0.10",
           "pynag >= 0.8.1, < 0.9",
+          "requests >= 2.2.1, < 2.3",
       ]
      )
