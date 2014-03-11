@@ -6,7 +6,7 @@ from setuptools import find_packages
 setup(name='wb_hosts',
       version='0.1',
       description='Atmosphere Monitoring Host Managment Service',
-      author='Coink',
+      author='Chris LaRose',
       author_email='cjlarose@iplantcollaborative.org',
       packages=find_packages(),
       install_requires=[
