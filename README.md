@@ -142,7 +142,25 @@ This container will accept database connections on port `5432`. If you'd like
 to back up the data (which is probably something you should do), just fire up a
 new container that links against the `wb_cloud_db` container with an image that
 has `pg_dump`. The Docker documentation has a [good example][13] on how to do
-that.
+something similar.
+
+### Cloud Service
+
+Like the hosts service, we'll have to generate some files with Thrift.
+
+    thrift --gen py thriftfiles/cloud.thrift
+    cp -R gen-py/wb_services cloud
+
+Modify `cloud/wb_cloud/settings.py` to include the database credentials you
+picked in the previous step, as well as any cloud configuration variables you'd
+like to include.
+
+Build and run:
+
+    docker build -t wb_cloud cloud
+    docker run -d -P -link wb_cloud_db:db wb_cloud
+
+The cloud service will accept connections over port 8000.
 
 [1]: http://docs.docker.io/en/latest/installation/ubuntulinux/
 [2]: http://github.com/iPlantCollaborativeOpenSource/weather-balloon/tree/master/thriftfiles/hosts.thrift
