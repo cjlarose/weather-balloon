@@ -95,7 +95,7 @@ into the hosts directory.
 Now, the hosts service supports just two methods, `set_hosts(list<hosts>
 hosts)` and `get_metrics(string host_id)`. When `set_hosts` is called, the host
 service removes all hosts currently monitored by Nagios, then adds all of the
-hosts that were passed in. Then, it sends a "RESTART_PROGRAM" command to
+hosts that were passed in. Then, it sends a `RESTART_PROGRAM` command to
 [Nagios' external commands interface][3], which, as you might imagine, restarts
 the monitoring daemon.
 
@@ -117,6 +117,33 @@ To run it:
 This will start a new container with the hosts service exposing its Thrift 
 server over port 8000.
 
+Cloud Service
+-------------
+
+The cloud service is responsible for repeatedly querying the clouds for the
+most up-to-date information, storing it to a database, and providing a
+well-defined way to query some of that information. Currently, it stores tons
+of information, and we only use to it query "leaderboard" information--it
+answers the question of which users have used the most resources. However, it
+is designed to be trivially extensible.
+
+### PostgreSQL
+
+We use PostgreSQL to store our cloud-related data. Before you build, feel free
+to modify the username, password, and database name in `cloud_db/Dockerfile`.
+That's my security disclaimer.
+
+To build:
+    
+    docker build -t wb_cloud_db cloud_db
+    docker run -d -P -name wb_cloud_db wb_cloud_db
+
+This container will accept database connections on port `5432`. If you'd like
+to back up the data (which is probably something you should do), just fire up a
+new container that links against the `wb_cloud_db` container with an image that
+has `pg_dump`. The Docker documentation has a [good example][13] on how to do
+that.
+
 [1]: http://docs.docker.io/en/latest/installation/ubuntulinux/
 [2]: http://github.com/iPlantCollaborativeOpenSource/weather-balloon/tree/master/thriftfiles/hosts.thrift
 [3]: http://nagios.sourceforge.net/docs/3_0/extcommands.html
@@ -129,3 +156,4 @@ server over port 8000.
 [10]: https://github.com/dotcloud/collectd-graphite
 [11]: https://graphite.readthedocs.org/en/1.0/feeding-carbon.html#the-pickle-protocol
 [12]: https://github.com/shawn-sterling/graphios
+[13]: http://docs.docker.io/en/latest/examples/postgresql_service/#using-container-linking
