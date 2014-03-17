@@ -3,7 +3,7 @@ from sqlalchemy import (Column, Integer, Text, String, DateTime, Boolean,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects import postgresql
 
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import backref, relationship
 
 Base = declarative_base()
 
