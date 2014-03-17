@@ -48,7 +48,8 @@ class CloudUpdate(object):
         will then add/remove hosts as it sees fit.
         """
         payload = [{
-            'client_name': instance.client_name,
+            'id': instance.client_name,
+            'display_name': instance.client_name,
             'address': instance.address
         } for instance in instances]
         self.hosts_service.set_hosts(payload)
@@ -78,7 +79,7 @@ def main():
     engine = create_engine(config['db_url'])
     Session = sessionmaker(bind=engine)
 
-    hosts_service = HostsService()
+    hosts_service = HostsService(*config['host_service'])
     ldap_client = LDAPClient(config['ldap_server'])
     cloud_update = CloudUpdate(Session(), hosts_service, providers, ldap_client)
     cloud_update.run()
