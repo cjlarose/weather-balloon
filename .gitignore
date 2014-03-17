@@ -1,3 +1,5 @@
 *.swp
 *.pyc
 gen-py
+*.egg-info
+threepio.log
