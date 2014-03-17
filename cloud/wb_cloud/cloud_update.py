@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 from wb_cloud.models import Cloud, Instance
 from wb_cloud.settings import config
-from wb_cloud.monitor import HostsService
+from wb_cloud.hosts_service import HostsService
 from wb_cloud.sync import CloudSyncManager
 from wb_cloud.sync.ldap_client import LDAPClient
 
