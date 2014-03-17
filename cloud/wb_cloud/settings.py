@@ -34,3 +34,10 @@ config['providers'] = {
 # LDAP Server configuration.
 
 config['ldap_server'] = "ldap://myldapserver.com"
+
+# Host service configuration.
+
+config['host_service'] = (
+    os.environ['WB_HOSTS_PORT_8000_TCP_ADDR'],
+    os.environ['WB_HOSTS_PORT_8000_TCP_PORT']
+)
