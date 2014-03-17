@@ -30,3 +30,7 @@ config['providers'] = {
         }
     ),
 }
+
+# LDAP Server configuration.
+
+config['ldap_server'] = "ldap://myldapserver.com"
