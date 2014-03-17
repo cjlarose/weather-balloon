@@ -1,76 +1,86 @@
 import logging
 import sys
 import os
+import importlib
 from time import localtime, strftime
 
-from sqlalchemy import engine_from_config
-from pyramid.paster import get_appsettings, setup_logging
+from sqlalchemy import create_engine
 
-from weatherballoon.models import DBStdSession as DBSession
-from weatherballoon.models import Cloud, Instance
-from weatherballoon.cloud import EucaCloud, AWSCloud, OpenStackCloud, OpenStackRtwoCloud
-from weatherballoon.cloud_secrets import PROVIDERS
-from weatherballoon.deploy import enqueue_deploy_instance
-from weatherballoon.monitor import set_hosts
-from weatherballoon.sync import CloudSyncManager
+from wb_cloud.models import Cloud, Instance
+from wb_cloud.settings import config
+from wb_cloud.monitor import HostsService
+from wb_cloud.sync import CloudSyncManager
+from wb_cloud.sync.ldap_client import LDAPClient
 
 logger = logging.getLogger(__name__)
 
-def get_monitored_vms():
-    return DBSession.query(Instance)\
-        .filter(Instance.end_date == None)
+class CloudUpdate(object):
 
-def notify_monitor(instances):
-    """
-    Update monitor to set the current list of instances. Monitor 
-    will then add/remove hosts as it sees fit
-    """ 
-    payload = [{
-        'client_name': instance.client_name,
-        'address': instance.address
-    } for instance in instances]
-    set_hosts(payload)
+    def __init__(self, db_session, hosts_service, providers, ldap_client):
+        self.db = db_session
+        self.hosts_service = hosts_service
+        self.providers = providers
+        self.ldap_client = ldap_client
 
-def update_clouds(settings):
-    logger.debug( "Start time: " + strftime("%c", localtime()))
+    def get_providers(self):
+        """
+        Returns a list of tuples (a, b) such that a is an instance of
+        wb_cloud.cloud.cloud.CloudConnection and b is an instance of
+        wb_cloud.models.Cloud.
+        """
+        for cloud_name, (cls, args) in self.providers.iteritems():
+            module_name, class_name = cls.rsplit('.', 1)
+            cloud_module = importlib.import_module(module_name)
+            cloud_connection_cls = getattr(cloud_module, class_name)
+            cloud_connection = cloud_connection_cls(**args)
 
-    cloud_connections = [
-        (EucaCloud(**PROVIDERS['euca']), 'Eucalyptus'), 
-        (OpenStackCloud(**PROVIDERS['openstack']), 'OpenStack'),
-        #(AWSCloudCloud(**PROVIDERS['aws']), 'AWS'),
-        (OpenStackRtwoCloud(**PROVIDERS['havanastack']), 'HavanaStack'),
-    ]
-    clouds = [
-        (connection, DBSession.query(Cloud).filter(Cloud.name == name).one()) 
-        for (connection, name) in cloud_connections
-    ]
-    for (cloud, cloud_model) in clouds:
-        logger.debug("Checking cloud %s" % cloud_model.name)
+            cloud_model = self.db.query(Cloud).filter(Cloud.name == name).one()
 
-        manager = CloudSyncManager(cloud, cloud_model, DBSession)
-        to_deploy = manager.synchronize()
-        for instance in to_deploy:
-            enqueue_deploy_instance.delay(instance, settings)
+            yield cloud_connection, cloud_model
 
-    hosts = get_monitored_vms()
-    notify_monitor(hosts)
+    def get_monitored_vms(self):
+        return self.db.query(Instance).filter(Instance.end_date == None)
 
-    logger.debug( "End time: " + strftime("%c", localtime()))
-    
-    logger.debug("\n\n" + "=" * 80 + "\n\n")
+    def notify_monitor(self, instances):
+        """
+        Update monitor to set the current list of instances. Monitor
+        will then add/remove hosts as it sees fit.
+        """
+        payload = [{
+            'client_name': instance.client_name,
+            'address': instance.address
+        } for instance in instances]
+        self.hosts_service.set_hosts(payload)
 
-def usage(argv):
-    cmd = os.path.basename(argv[0])
-    print('usage: %s <config_uri>\n'
-          '(example: "%s development.ini")' % (cmd, cmd))
-    sys.exit(1)
+    def run():
+        logger.debug( "Start time: " + strftime("%c", localtime()))
 
-def main(argv=sys.argv):
-    if len(argv) != 2:
-        usage(argv)
-    config_uri = argv[1]
-    setup_logging(config_uri)
-    settings = get_appsettings(config_uri)
-    engine = engine_from_config(settings, 'sqlalchemy.')
-    DBSession.configure(bind=engine)
-    update_clouds(settings)
+        clouds = self.get_providers()
+        for (cloud, cloud_model) in clouds:
+            logger.debug("Checking cloud %s" % cloud_model.name)
+
+            manager = CloudSyncManager(cloud, cloud_model, self.db_session)
+            to_deploy = manager.synchronize()
+            for instance in to_deploy:
+                print instance
+
+        hosts = self.get_monitored_vms()
+        self.notify_monitor(hosts)
+
+        logger.debug( "End time: " + strftime("%c", localtime()))
+
+        logger.debug("\n\n" + "=" * 80 + "\n\n")
+
+def main():
+    providers = config['providers']
+
+    engine = create_engine(config['db_url'])
+    session = sessionmaker(bind=engine)
+
+    hosts_service = HostsService()
+    ldap_client = LDAPClient(config['ldap_server'])
+    cloud_update = CloudUpdate(session, hosts_service, providers, ldap_client)
+    cloud_update.run()
+
+if __name__ == "__main__":
+    main()
