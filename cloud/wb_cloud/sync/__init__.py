@@ -4,13 +4,12 @@ from datetime import datetime
 import pytz
 from sqlalchemy.orm.exc import NoResultFound
 
-from weatherballoon.models import Instance, User, Image, InstanceType
-from weatherballoon.sync.ldap_client import LDAPClient
+from wb_cloud.models import Instance, User, Image, InstanceType
 
 logger = logging.getLogger(__name__)
 
 class CloudSyncManager(object):
-    def __init__(self, cloud, model, db_session):
+    def __init__(self, cloud, model, db_session, ldap_client):
         """
         cloud is an instance of weatherballoon.cloudconnection
         model is an instance of weatherballoon.models.Cloud
@@ -19,6 +18,7 @@ class CloudSyncManager(object):
         self.cloud = cloud
         self.model = model
         self.db_session = db_session
+        self.ldap_client = ldap_client
         
     def get_monitored_vms(self):
         """
@@ -39,9 +39,8 @@ class CloudSyncManager(object):
         try:
             user = self.db_session.query(User).filter(User.username == cloud_user.name).one()
         except NoResultFound:
-            l = LDAPClient()
-            ldapuser = l.get_user(cloud_user.name)
-            staff_users = l.get_staff_users()
+            ldapuser = self.ldap_client.get_user(cloud_user.name)
+            staff_users = self.ldap_client.get_staff_users()
             if ldapuser is not None:
                 user = User(
                     username=cloud_user.name,
