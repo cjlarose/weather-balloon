@@ -112,7 +112,7 @@ make use of [container linkage][7] again.
 To run it:
 
     docker build -t wb_hosts hosts
-    docker run -d -p 8000 -volumes-from nagios -link graphite:graphite wb_hosts
+    docker run -d -p 8000 -volumes-from nagios -link graphite:graphite -name wb_hosts wb_hosts
 
 This will start a new container with the hosts service exposing its Thrift 
 server over port 8000.
@@ -158,7 +158,7 @@ like to include.
 Build and run:
 
     docker build -t wb_cloud cloud
-    docker run -d -P -link wb_cloud_db:db wb_cloud
+    docker run -d -P -link wb_cloud_db:db -link wb_hosts:wb_hosts wb_cloud
 
 The cloud service will accept connections over port 8000.
 
