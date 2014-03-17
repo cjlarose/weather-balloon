@@ -5,6 +5,7 @@ import importlib
 from time import localtime, strftime
 
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from wb_cloud.models import Cloud, Instance
 from wb_cloud.settings import config
@@ -34,7 +35,7 @@ class CloudUpdate(object):
             cloud_connection_cls = getattr(cloud_module, class_name)
             cloud_connection = cloud_connection_cls(**args)
 
-            cloud_model = self.db.query(Cloud).filter(Cloud.name == name).one()
+            cloud_model = self.db.query(Cloud).filter(Cloud.name == cloud_name).one()
 
             yield cloud_connection, cloud_model
 
@@ -52,14 +53,14 @@ class CloudUpdate(object):
         } for instance in instances]
         self.hosts_service.set_hosts(payload)
 
-    def run():
+    def run(self):
         logger.debug( "Start time: " + strftime("%c", localtime()))
 
         clouds = self.get_providers()
         for (cloud, cloud_model) in clouds:
             logger.debug("Checking cloud %s" % cloud_model.name)
 
-            manager = CloudSyncManager(cloud, cloud_model, self.db_session)
+            manager = CloudSyncManager(cloud, cloud_model, self.db, self.ldap_client)
             to_deploy = manager.synchronize()
             for instance in to_deploy:
                 print instance
@@ -75,11 +76,11 @@ def main():
     providers = config['providers']
 
     engine = create_engine(config['db_url'])
-    session = sessionmaker(bind=engine)
+    Session = sessionmaker(bind=engine)
 
     hosts_service = HostsService()
     ldap_client = LDAPClient(config['ldap_server'])
-    cloud_update = CloudUpdate(session, hosts_service, providers, ldap_client)
+    cloud_update = CloudUpdate(Session(), hosts_service, providers, ldap_client)
     cloud_update.run()
 
 if __name__ == "__main__":
