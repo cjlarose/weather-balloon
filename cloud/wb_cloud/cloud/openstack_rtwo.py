@@ -5,9 +5,9 @@ from rtwo.provider import OSProvider
 from rtwo.identity import OSIdentity
 from rtwo.driver import OSDriver
 
-from weatherballoon.cloud.cloud import CloudConnection
-from weatherballoon.cloud.models import Instance, Image, User, InstanceType
-from weatherballoon.cloud.exception import ImageNotFound, InstanceTypeNotFound
+from wb_cloud.cloud.cloud import CloudConnection
+from wb_cloud.cloud.models import Instance, Image, User, InstanceType
+from wb_cloud.cloud.exception import ImageNotFound, InstanceTypeNotFound
 
 logger = logging.getLogger(__name__)
 
