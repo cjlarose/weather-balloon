@@ -17,6 +17,7 @@ setup(name='wb_cloud',
           'requests == 2.2',
           'rtwo >= 0.1.8, < 0.2',
           'psycopg2 >= 2.5.2, < 2.6',
+          'PyYAML >= 3.10, < 4.0',
       ],
       dependency_links=[
           'git+https://github.com/iPlantCollaborativeOpenSource/rtwo.git@master#egg=rtwo-0.1.8',
