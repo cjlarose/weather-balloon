@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from wb_services.cloud import Cloud
+from wb_services.cloud.ttypes import UserStats
 from wb_cloud.users import leaderboard_query
 
 class Handler(Cloud.Iface):
@@ -24,13 +25,16 @@ class Handler(Cloud.Iface):
 
     @staticmethod
     def format_results(results):
-        out = [{
-            "username" : username,
-            "is_staff": is_staff,
-            "total_uptime": int(uptime) if uptime else None,
-            "total_cpu_time": int(cpu_seconds) if cpu_seconds else None,
-            "instance_count": instance_count
-        } for uid, uptime, cpu_seconds, instance_count, username, is_staff, name in results
-        if cpu_seconds and uptime]
+        def format_result(result):
+            (uid, uptime, cpu_seconds, instance_count, username, is_staff,
+                name) = result
+            args = {
+                "username" : username,
+                "is_staff": is_staff,
+                "total_uptime_seconds": int(uptime) if uptime else 0,
+                "cpu_time_seconds": int(cpu_seconds) if cpu_seconds else 0,
+                "instance_count": instance_count
+            }
+            return UserStats(**args)
 
-        return out
+        return [format_result(r) for r in results]
