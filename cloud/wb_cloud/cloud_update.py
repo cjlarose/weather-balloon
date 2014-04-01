@@ -7,6 +7,7 @@ from time import localtime, strftime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from wb_cloud import setup_logging
 from wb_cloud.models import Cloud, Instance
 from wb_cloud.settings import config
 from wb_cloud.hosts_service import HostsService
@@ -63,8 +64,8 @@ class CloudUpdate(object):
 
             manager = CloudSyncManager(cloud, cloud_model, self.db, self.ldap_client)
             to_deploy = manager.synchronize()
-            for instance in to_deploy:
-                print instance
+            logging.debug("TO DEPLOY:")
+            logging.debug(to_deploy)
 
         hosts = self.get_monitored_vms()
         self.notify_monitor(hosts)
@@ -85,4 +86,5 @@ def main():
     cloud_update.run()
 
 if __name__ == "__main__":
+    setup_logging()
     main()
