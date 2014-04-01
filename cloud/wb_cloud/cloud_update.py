@@ -2,7 +2,7 @@ import logging
 import sys
 import os
 import importlib
-from time import localtime, strftime
+from time import localtime, strftime, sleep
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -83,7 +83,11 @@ def main():
     hosts_service = HostsService(*config['host_service'])
     ldap_client = LDAPClient(config['ldap_server'])
     cloud_update = CloudUpdate(Session(), hosts_service, providers, ldap_client)
-    cloud_update.run()
+
+    # Repeat every 10 minutes
+    while True:
+        cloud_update.run()
+        sleep(10 * 60)
 
 if __name__ == "__main__":
     setup_logging()
